@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+#ignoring .json files
+
+*.json
+
+#ignoring .DS_Store file
+
+*.DS_Store
