@@ -131,7 +131,7 @@ dist
 
 #ignoring .json files
 
-*.json
+*package-lock.json
 
 #ignoring .DS_Store file
 

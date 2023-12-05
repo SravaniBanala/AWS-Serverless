@@ -23,7 +23,7 @@ const downloadRepo = async (repoUrl, destination) => {
     const zipUrl = repoUrl;
     const response = await axios.get(zipUrl, { responseType: 'arraybuffer' });
 
-    console.log(response, "is the current response");
+    console.log(response, "This is the Current Response");
 
     if (response.headers['content-type'] === 'application/zip') 
     {
@@ -31,12 +31,12 @@ const downloadRepo = async (repoUrl, destination) => {
       const __dirname = path.dirname(__filename);
       const zipFilePath = path.join('/tmp', `${destination}.zip`);
       fs.writeFileSync(zipFilePath, Buffer.from(response.data));
-      console.log('Repository cloned and zipped successfully.');
+      console.log('Repository cloned and Zipped Successfully.');
       return 1;
     }
     else 
     {
-      console.error(`Error downloading repository, Given URL is not pointing to ZIP. HTTP Status: ${response.status}, - having type - ${response.headers['Content-Type']}`);
+      console.error(`Error Downloading Repository, Given URL is not pointing to ZIP. HTTP Status: ${response.status}, - having type - ${response.headers['Content-Type']}`);
       return 0;
     }
   } 
@@ -44,7 +44,7 @@ const downloadRepo = async (repoUrl, destination) => {
   {
     if (error.response && error.response.status === 404)
     {
-      console.error(`Error downloading repository: The requested resource was not found (HTTP Status 404)`);
+      console.error(`Error downloading Repository: The requested resource was not found (HTTP Status 404)`);
       return 0;
     }
     console.error(`Error downloading repository: ${error.message}`);
@@ -57,7 +57,7 @@ const downloadRepo = async (repoUrl, destination) => {
 export const handler = async (event) => 
 {
 
-  console.log(process.env.client_email, "this is my test email");
+  console.log(process.env.client_email, "This is my Test Email");
 
   try 
   {
@@ -71,13 +71,19 @@ export const handler = async (event) =>
     console.log(MessageAttributes)
     
     const submissionURL = await MessageAttributes.submission_url.Value
+    console.log(submissionURL, "This is Submission Url");
     const submittedUserEmail = await MessageAttributes.user_email.Value
+    console.log(submittedUserEmail, "This is Submission Email");
     const submittedassignmentID = await MessageAttributes.assignmentID.Value
+    console.log(submittedassignmentID, "This is Submitted Assignment ID");
     const submissionID = await MessageAttributes.submissionID.Value
+    console.log(submissionID, "This is Submission ID");
     const assignmentName = await MessageAttributes.assignment_Name.Value
+    console.log(assignmentName, "This is Submitted Assignment Name");
     const assignmentCount = await MessageAttributes.submissionCount.Value
+    console.log(assignmentCount, "This is Submission count");
     
-    console.log(await submissionURL,"this is url",await submittedUserEmail, "This is email", await submittedassignmentID, await submissionID);
+    console.log(await submissionURL,"This is Url",await submittedUserEmail, "This is Email", await submittedassignmentID, await submissionID);
 
     const downloadStatus = await downloadRepo(submissionURL, submittedassignmentID)
 
@@ -88,12 +94,12 @@ export const handler = async (event) =>
     {
       const submittedBucketName = `${assignmentName}/${submittedUserEmail}/submissionCount-${assignmentCount}.zip`;
 
-      console.log(bucketName, "uploading bucket name");
+      console.log(bucketName, "Updating Bucket Name");
 
       [uploadStatus, url] = await uploadtogcs(bucketName,`/tmp/${submittedassignmentID}.zip`, submittedBucketName);
       if (uploadStatus === 1)
       {
-        console.log("Successfully uploaded to GCP");
+        console.log("Successfully Uploaded to GCP");
         await sendAssignmentSubmissionStatus(submittedUserEmail, assignmentName, downloadStatus, uploadStatus, url, submittedBucketName);
       }
       else
@@ -104,7 +110,7 @@ export const handler = async (event) =>
     }
     else
     {
-      console.log("Failed to download the zip from the given URL with unproper email");
+      console.log("Failed to download the zip from the given URL with improper Email");
       await sendAssignmentSubmissionStatus(submittedUserEmail, assignmentName, downloadStatus, uploadStatus, submissionURL);
     }
 
@@ -113,24 +119,24 @@ export const handler = async (event) =>
     const dynamoDBData = {
       uniqueId: { S : uuidv4() },
       submittedassignmentid: { S : submittedassignmentID }, 
-      downloadurl: { S : url[0] ? url[0] : "NULL" },
+      downloadurl: { S: Array.isArray(url) && url.length > 0 ? url[0] : "NULL" },
       submittedurl: { S : submissionURL }
     };
 
-    console.log(dynamoDBData,"This is dynamo DB Data");
+    console.log(dynamoDBData,"This is DynamoDB Data");
 
     try 
     {
       await dynamoDBPut(dynamoDBData);
-      console.log('Successfully added data to dynamoDB');
-      console.log("here is the email sent");
+      console.log('Successfully added the data to DynamoDB');
+      console.log("This is the email sent");
     }
     catch(error)
     {
-      console.log("error adding into the dynamodb");
+      console.log("Error adding into the DynamoDB");
       return {statusCode: 500,body: "Error DynamoDB Issue"};
     }
-    return {statusCode: 200,body: "Successfully Executed Lambda Function"};
+    return {statusCode: 200,body: "Successfully Executed the Lambda Function"};
   } 
   catch (error) 
   {

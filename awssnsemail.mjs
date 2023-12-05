@@ -24,7 +24,7 @@ async function sendAssignmentSubmissionStatus(toEmail, assignmentName, downloadS
 
   let emailSubject;
   let emailBody;
-
+  console.log("email properties",toEmail,assignmentName,downloadStatus,uploadStatus,url);
   // console.log(isValidZipURL,"Is current zip url status");
 
     console.log("I am proper zip email")
@@ -33,19 +33,20 @@ async function sendAssignmentSubmissionStatus(toEmail, assignmentName, downloadS
   if (downloadStatus === 1 && uploadStatus === 1)
   {
     emailSubject = 'Assignment Submission Status Successful';
-    emailBody = `Assignment ${assignmentName} has been submitted successfully, stored in Google Cloud Storage download from this URL - ${url} with File Name - ${filePath}`;
+    console.log("email stratus",1);
+    emailBody = `Assignment ${assignmentName} has been submitted successfully, stored in Google Cloud Storage download with File Name - ${filePath}`;
   }
   else
   {
     if (downloadStatus === 1)
     {
       emailSubject = 'Assignment Submission Status Failure';
-      emailBody = `Assignment : ${assignmentName} Downloaded Successfully Failed to upload to GCP contact Admin`;
+      emailBody = `Assignment : ${assignmentName} Downloaded Successfully \nFailed to upload to GCP contact Admin`;
     }
     else
     {
       emailSubject = 'Assignment Submission Status Failure';
-      emailBody = `Assignment : ${assignmentName} Submission Failed enter proper url, invalid submitted url - ${url}`;
+      emailBody = `Assignment : ${assignmentName} Submission Failed \nPlease enter proper URL`;
     }
   }
 
@@ -54,6 +55,9 @@ async function sendAssignmentSubmissionStatus(toEmail, assignmentName, downloadS
   const ccEmailList = JSON.parse(ccEmailListString);
 
   const formattedCcList = ccEmailList.map(email => `"${email}"`).join(', ');
+  console.log("email ",senderEmail,toEmail,formattedCcList);
+
+  console.log("This is transporter",transporter);
 
   const info = await transporter.sendMail({
     from: senderEmail,
@@ -65,6 +69,5 @@ async function sendAssignmentSubmissionStatus(toEmail, assignmentName, downloadS
   console.log(info);
   console.log(`Message sent to: ${toEmail}, messageId - ${info.messageId}.`);
 }
-
 
 export default sendAssignmentSubmissionStatus;
